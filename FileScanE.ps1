@@ -1,21 +1,31 @@
-﻿$currentDrive = 'E' #((get-location).Drive.Name)
+﻿<#	
+	.NOTES
+	===========================================================================
+	 Created on:   	2017-03-15
+	 Created by:   	Erhard Rainer
+	 Filename:     	FileScan.ps1
+	===========================================================================
+	.DESCRIPTION
+		Diese Datei wird am jeweiligen Rechner ausgeführt, und überträgt die 
+        Dateien an den SQL-Server
+#>
+
+ Param(
+                [Parameter(Mandatory=$False,Position=1)]
+                [string]$currentDrive
+                )
+
+
+# globale Variablen 
+if (($currentDrive).Length -eq 0)
+{
+    $currentDrive = ((get-location).Drive.Name)
+}
+
+
+# [0] Vorbereitung
 $startdir = $currentDrive + ":\"
 Write-Host "Analyse folder: $startdir"
-
-#Files einlesen
-$startime = (get-Date)
-$files = Get-ChildItem -Path $startdir -Recurse -ErrorAction SilentlyContinue
-$endtime = (get-Date)
-
-#DataTable erstellen
-$dttable = New-Object system.Data.DataTable 'Content'
-$newcol = New-Object system.Data.DataColumn FullName,([string]); $dttable.columns.add($newcol)
-$newcol = New-Object system.Data.DataColumn Name,([string]); $dttable.columns.add($newcol)
-$newcol = New-Object system.Data.DataColumn Directory,([string]); $dttable.columns.add($newcol)
-$newcol = New-Object system.Data.DataColumn Extension,([string]); $dttable.columns.add($newcol)
-$newcol = New-Object system.Data.DataColumn CreationDate,([DateTime]); $dttable.columns.add($newcol)
-$newcol = New-Object system.Data.DataColumn Size,([Int64]); $dttable.columns.add($newcol)
-
 
 #Get Drive Information
 #$driveInfo = (Get-PSDrive $currentDrive)
@@ -30,6 +40,22 @@ if ($drivename.length -eq 0)
     $drive.VolumeName = $drivename
     $null = $drive.Put()
 }
+
+
+# [1] Einlesen des Dateisystems
+#Files einlesen
+$startime = (get-Date)
+$files = Get-ChildItem -Path $startdir -Recurse -ErrorAction SilentlyContinue
+$endtime = (get-Date)
+
+#DataTable erstellen
+$dttable = New-Object system.Data.DataTable 'Content'
+$newcol = New-Object system.Data.DataColumn FullName,([string]); $dttable.columns.add($newcol)
+$newcol = New-Object system.Data.DataColumn Name,([string]); $dttable.columns.add($newcol)
+$newcol = New-Object system.Data.DataColumn Directory,([string]); $dttable.columns.add($newcol)
+$newcol = New-Object system.Data.DataColumn Extension,([string]); $dttable.columns.add($newcol)
+$newcol = New-Object system.Data.DataColumn CreationDate,([DateTime]); $dttable.columns.add($newcol)
+$newcol = New-Object system.Data.DataColumn Size,([Int64]); $dttable.columns.add($newcol)
 
 
 ##$files | ft fullname, name, length
@@ -121,10 +147,6 @@ foreach ($file in $files)
         }
 }
 #$dttable
-
-
-
-
 
 
 #Remove-Variable -name table
