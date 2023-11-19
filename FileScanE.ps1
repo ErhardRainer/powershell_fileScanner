@@ -22,7 +22,7 @@ if (($currentDrive).Length -eq 0)
     $currentDrive = ((get-location).Drive.Name)
 }
 
-
+Write-host (get-Date)
 # [0] Vorbereitung
 $startdir = $currentDrive + ":\"
 Write-Host "Analyse folder: $startdir"
@@ -34,7 +34,7 @@ $driveInfo2 = (Get-Volume -DriveLetter $currentDrive)
 $drivename = $driveInfo2.FileSystemLabel
 if ($drivename.length -eq 0)
 {
-    $drivename = Read-Host 'Enter a Name fro this Drive:'
+    $drivename = Read-Host 'Enter a Name for this Drive:'
     $driveletter = $currentDrive + ":"
     $drive = Get-WmiObject "Win32_LogicalDisk WHERE DeviceID='$driveletter'"
     $drive.VolumeName = $drivename
